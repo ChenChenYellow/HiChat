@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using HiChat.GUI;
 
-
-namespace Hichat
+namespace HiChat
 {
     static class Program
     {

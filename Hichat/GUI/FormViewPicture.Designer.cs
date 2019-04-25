@@ -1,4 +1,4 @@
-﻿namespace Hichat.GUI
+﻿namespace HiChat.GUI
 {
     partial class FormViewPicture
     {

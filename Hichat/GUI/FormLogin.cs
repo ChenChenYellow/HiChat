@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Hichat;
-using HiChat;
+using static HiChat.Buisness.HiChat;
 
-namespace Hichat
+namespace HiChat.GUI
 {
     public partial class FormLogin : Form
     {
@@ -21,13 +14,11 @@ namespace Hichat
 
         private void FormLogin_Load(object sender, EventArgs e)
         {
-            //DateTime d = DateTime.Now;
-            //MessageBox.Show("\n" + d.ToLongDateString() + "\n" + d.ToLongTimeString() + "\n" + d.ToShortDateString() + "\n" + d.ToString("yyyy-MM-dd-HH-mm-ss"));
             this.BackColor = ColorTranslator.FromHtml("#f5f5f5");
             btnLogin.BackColor = ColorTranslator.FromHtml("#1aad19");
             lblUser.ForeColor = ColorTranslator.FromHtml("#878787");
             lblPassword.ForeColor = ColorTranslator.FromHtml("#878787");
-            if (!HiChat.HiChat.TestConnection())
+            if (!TestConnection())
             {
                 MessageBox.Show("NO Connection");
             }
@@ -43,7 +34,7 @@ namespace Hichat
         {
             string username = txtUserName.Text;
             string password = txtPassword.Text;
-            if (HiChat.HiChat.Login(username, password))
+            if (Login(username, password))
             {
                 txtPassword.Clear();
                 txtUserName.Clear();
@@ -55,7 +46,6 @@ namespace Hichat
             {
                 MessageBox.Show("Login Failed", "Login Failed");
             }
-            
         }
 
         private void Myform_FormClosed(object sender, FormClosedEventArgs e)

@@ -20,11 +20,10 @@ using System.Xml.Serialization;
 using System.Data.OleDb;
 using System.Data;
 
-namespace HiChat
+namespace HiChat.Buisness
 {
     public static class HiChat
     {
-
         private static FirebaseConfig config = new FirebaseConfig
         {
             BasePath = @"https://cs-project-ed1af.firebaseio.com/",
@@ -191,8 +190,6 @@ namespace HiChat
             if (temp.Contains(friendUsername))
             {
                 temp.Remove(friendUsername);
-                MessageBox.Show(userPath + username + friendPath);
-                MessageBox.Show(JsonConvert.SerializeObject(temp));
                 client.Set(userPath + username + friendPath, temp);
                 return true;
             }
@@ -723,28 +720,28 @@ namespace HiChat
             temp.Type = type;
             return temp;
         }
-        public static ImageFormat GetImFormat(this System.Drawing.Image img)
+        public static ImageFormat GetImFormat(Image img)
         {
-            if (img.RawFormat.Equals(System.Drawing.Imaging.ImageFormat.Jpeg))
-                return System.Drawing.Imaging.ImageFormat.Jpeg;
-            if (img.RawFormat.Equals(System.Drawing.Imaging.ImageFormat.Bmp))
-                return System.Drawing.Imaging.ImageFormat.Bmp;
-            if (img.RawFormat.Equals(System.Drawing.Imaging.ImageFormat.Png))
-                return System.Drawing.Imaging.ImageFormat.Png;
-            if (img.RawFormat.Equals(System.Drawing.Imaging.ImageFormat.Emf))
-                return System.Drawing.Imaging.ImageFormat.Emf;
-            if (img.RawFormat.Equals(System.Drawing.Imaging.ImageFormat.Exif))
-                return System.Drawing.Imaging.ImageFormat.Exif;
-            if (img.RawFormat.Equals(System.Drawing.Imaging.ImageFormat.Gif))
-                return System.Drawing.Imaging.ImageFormat.Gif;
-            if (img.RawFormat.Equals(System.Drawing.Imaging.ImageFormat.Icon))
-                return System.Drawing.Imaging.ImageFormat.Icon;
-            if (img.RawFormat.Equals(System.Drawing.Imaging.ImageFormat.MemoryBmp))
-                return System.Drawing.Imaging.ImageFormat.MemoryBmp;
-            if (img.RawFormat.Equals(System.Drawing.Imaging.ImageFormat.Tiff))
-                return System.Drawing.Imaging.ImageFormat.Tiff;
+            if (img.RawFormat.Equals(ImageFormat.Jpeg))
+                return ImageFormat.Jpeg;
+            if (img.RawFormat.Equals(ImageFormat.Bmp))
+                return ImageFormat.Bmp;
+            if (img.RawFormat.Equals(ImageFormat.Png))
+                return ImageFormat.Png;
+            if (img.RawFormat.Equals(ImageFormat.Emf))
+                return ImageFormat.Emf;
+            if (img.RawFormat.Equals(ImageFormat.Exif))
+                return ImageFormat.Exif;
+            if (img.RawFormat.Equals(ImageFormat.Gif))
+                return ImageFormat.Gif;
+            if (img.RawFormat.Equals(ImageFormat.Icon))
+                return ImageFormat.Icon;
+            if (img.RawFormat.Equals(ImageFormat.MemoryBmp))
+                return ImageFormat.MemoryBmp;
+            if (img.RawFormat.Equals(ImageFormat.Tiff))
+                return ImageFormat.Tiff;
             else
-                return System.Drawing.Imaging.ImageFormat.Wmf;
+                return ImageFormat.Wmf;
         }
 
         public static Image CopyImage(string path)

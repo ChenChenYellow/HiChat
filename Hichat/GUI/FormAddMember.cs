@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using HiChat;
+using HiChat.Buisness;
 
-namespace Hichat.GUI
+namespace HiChat.GUI
 {
     public partial class FormAddMember : Form
     {
@@ -36,15 +30,15 @@ namespace Hichat.GUI
 
         private void buttonConfirm_Click(object sender, EventArgs e)
         {
-            Sheet = this.checkedListBox1;
+            Sheet = checkedListBox1;
             Result = true;
-            this.Close();
+            Close();
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
             Result = false;
-            this.Close();
+            Close();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Hichat
+﻿namespace HiChat.GUI
 {
     partial class FormMenu
     {

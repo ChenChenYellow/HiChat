@@ -7,8 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static HiChat.Buisness.HiChat;
 
-namespace Hichat
+namespace HiChat.GUI
 {
     public partial class Register : Form
     {
@@ -37,10 +38,10 @@ namespace Hichat
             }
             else
             {
-                string imgArr = HiChat.HiChat.SerializeImage(picboxProfile.Image, HiChat.HiChat.GetImFormat(picboxProfile.Image));
-                if (HiChat.HiChat.Register(txtUserName.Text, txtPassword.Text))
+                string imgArr = SerializeImage(picboxProfile.Image, GetImFormat(picboxProfile.Image));
+                if (Register(txtUserName.Text, txtPassword.Text))
                 {
-                    HiChat.HiChat.SetProfileImage(txtUserName.Text, imgArr);
+                    SetProfileImage(txtUserName.Text, imgArr);
                     MessageBox.Show("Register Succesfully.");
                     this.Close();
                 }

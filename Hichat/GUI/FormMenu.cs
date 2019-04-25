@@ -3,23 +3,20 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Data.OleDb;
 using System.IO;
 using Microsoft.VisualBasic;
-using HiChat;
-using Hichat.GUI;
-namespace Hichat
+
+using HiChat.Buisness;
+using static HiChat.Buisness.HiChat;
+namespace HiChat.GUI
 {
     public partial class FormMenu : Form
     {
         private string username;
         private List<string> friendList;
         private List<Group> groupList;
-        private List<HiChat.Message> messages;
+        private List<Buisness.Message> messages;
         private Timer timer1;
         private int count;
         private Image myImage;
@@ -46,7 +43,7 @@ namespace Hichat
         }
         private void timer1_Tick(object sender, EventArgs e)
         {
-            HiChat.HiChat.DownloadMessage(username);
+            DownloadMessage(username);
             if (tabControlFriendGroup.SelectedIndex == 0 && lstFriend.SelectedIndex > -1)
             {
                 updateGrid();
@@ -56,43 +53,43 @@ namespace Hichat
                 updateGroupGrid();
             }
 
-            List<Friend_Request> frientRequests = HiChat.HiChat.GetFriend_Request(username);
-            HiChat.HiChat.DeleteFriendRequest(username);
+            List<Friend_Request> frientRequests = GetFriend_Request(username);
+            DeleteFriendRequest(username);
             foreach (Friend_Request fr in frientRequests)
             {
                 if (MessageBox.Show(fr.Sender + " wants to be friend with you, Accept?", "Friend Request", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
-                    HiChat.HiChat.AddFriend(username, fr.Sender);
-                    friendList = HiChat.HiChat.GetFriend(username);
+                    AddFriend(username, fr.Sender);
+                    friendList = GetFriend(username);
                     lstFriend.DataSource = friendList;
                 }
             }
         }
         private void FormMenu_Load(object sender, EventArgs e)
         {
-            HiChat.HiChat.CreateOrOpenUserDataBase(username);
-            string myContent = HiChat.HiChat.GetProgileImage(username);
+            CreateOrOpenUserDataBase(username);
+            string myContent = GetProgileImage(username);
             if (!string.IsNullOrEmpty(myContent))
             {
-                HiChat.HiChat.SaveImage(myContent, profileImagePath + username + ".jpeg");
-                myImage = HiChat.HiChat.CopyImage(profileImagePath + username + ".jpeg");
+                SaveImage(myContent, profileImagePath + username + ".jpeg");
+                myImage = CopyImage(profileImagePath + username + ".jpeg");
             }
             else
             {
-                myImage = HiChat.HiChat.CopyImage(defaultProfileImagePath);
+                myImage = CopyImage(defaultProfileImagePath);
             }
-            friendList = HiChat.HiChat.GetFriend(username);
+            friendList = GetFriend(username);
             foreach (string item in friendList)
             {
-                string content = HiChat.HiChat.GetProgileImage(item);
+                string content = GetProgileImage(item);
                 if (content != null)
                 {
-                    HiChat.HiChat.SaveImage(content, profileImagePath + item + ".jpeg");
+                    SaveImage(content, profileImagePath + item + ".jpeg");
                 }
             }
             lstFriend.DataSource = friendList;
 
-            groupList = HiChat.HiChat.GetGroupByID(HiChat.HiChat.GetGroupID(username));
+            groupList = GetGroupByID(GetGroupID(username));
             lstGroup.DataSource = groupList;
 
             InitTimer();
@@ -117,13 +114,13 @@ namespace Hichat
         {
             if (tabControlFriendGroup.SelectedIndex == 0)
             {
-                HiChat.HiChat.AddMessageToLocal(HiChat.HiChat.SendMessage(username, lstFriend.SelectedItem.ToString(), txtSend.Text.ToString()));
+                AddMessageToLocal(SendMessage(username, lstFriend.SelectedItem.ToString(), txtSend.Text.ToString()));
                 txtSend.Clear();
 
             }
             else
             {
-                HiChat.HiChat.AddMessageToLocal(HiChat.HiChat.SendMessageToGroup(username, ((Group)lstGroup.SelectedItem).Id.ToString(), txtSend.Text.ToString()));
+                AddMessageToLocal(SendMessageToGroup(username, ((Group)lstGroup.SelectedItem).Id.ToString(), txtSend.Text.ToString()));
                 txtSend.Clear();
             }
         }
@@ -150,20 +147,20 @@ namespace Hichat
         private void initGroupGrid()
         {
             panelMessage.Controls.Clear();
-            messages = HiChat.HiChat.GetMessageOfGroup(((Group)lstGroup.SelectedItem).Id);
+            messages = GetMessageOfGroup(((Group)lstGroup.SelectedItem).Id);
             messages.Sort((x, y) => x.Message_date.CompareTo(y.Message_date));
             count = 0;
             loadGroupControls(messages);
         }
-        private void loadGroupControls(List<HiChat.Message> mes)
+        private void loadGroupControls(List<Buisness.Message> mes)
         {
             int margin = 10;
-            foreach (HiChat.Message m in mes)
+            foreach (Buisness.Message m in mes)
             {
-                Image friend_Image = HiChat.HiChat.CopyImage(defaultProfileImagePath);
+                Image friend_Image = CopyImage(defaultProfileImagePath);
                 if (File.Exists(profileImagePath + m.Sender.ToString() + ".jpeg"))
                 {
-                    friend_Image = HiChat.HiChat.CopyImage(profileImagePath + m.Sender.ToString() + ".jpeg");
+                    friend_Image = CopyImage(profileImagePath + m.Sender.ToString() + ".jpeg");
                 }
 
                 PictureBox p = new PictureBox();
@@ -199,7 +196,7 @@ namespace Hichat
                         case ".png":
                         case ".jpeg":
                             PictureBox picture = new PictureBox();
-                            picture.Image = HiChat.HiChat.CopyImage(m.Content);
+                            picture.Image = CopyImage(m.Content);
                             picture.SizeMode = PictureBoxSizeMode.Zoom;
                             picture.MinimumSize = new Size(50, 50);
                             picture.MaximumSize = new Size(300, 300);
@@ -223,12 +220,12 @@ namespace Hichat
                                     {
                                         if (MessageBox.Show("File Exist, Overwrite?", "File Exist", MessageBoxButtons.YesNo) == DialogResult.Yes)
                                         {
-                                            File.Copy(HiChat.HiChat.appDataImagePath + m.Type, sf.FileName, true);
+                                            File.Copy(appDataImagePath + m.Type, sf.FileName, true);
                                         }
                                     }
                                     else
                                     {
-                                        File.Copy(HiChat.HiChat.appDataImagePath + m.Type, sf.FileName, true);
+                                        File.Copy(appDataImagePath + m.Type, sf.FileName, true);
                                     }
                                 }
                             };
@@ -269,7 +266,7 @@ namespace Hichat
         }
         private void updateGroupGrid()
         {
-            List<HiChat.Message> newMessages = HiChat.HiChat.GetMessageOfGroup(((Group)lstGroup.SelectedItem).Id);
+            List<Buisness.Message> newMessages = GetMessageOfGroup(((Group)lstGroup.SelectedItem).Id);
             int oldMessages = messages.Count;
             newMessages.Sort((x, y) => x.Message_date.CompareTo(y.Message_date));
 
@@ -284,20 +281,20 @@ namespace Hichat
         private void initGrid()
         {
             panelMessage.Controls.Clear();
-            messages = HiChat.HiChat.GetMessageOfUser(lstFriend.SelectedItem.ToString());
+            messages = GetMessageOfUser(lstFriend.SelectedItem.ToString());
             messages.Sort((x, y) => x.Message_date.CompareTo(y.Message_date));
             count = 0;
             loadControls(messages);
         }
-        private void loadControls(List<HiChat.Message> mes)
+        private void loadControls(List<Buisness.Message> mes)
         {
             int margin = 10;
-            Image friend_Image = HiChat.HiChat.CopyImage(defaultProfileImagePath);
+            Image friend_Image = CopyImage(defaultProfileImagePath);
             if (File.Exists(profileImagePath + lstFriend.SelectedItem.ToString() + ".jpeg"))
             {
-                friend_Image = HiChat.HiChat.CopyImage(profileImagePath + lstFriend.SelectedItem.ToString() + ".jpeg");
+                friend_Image = CopyImage(profileImagePath + lstFriend.SelectedItem.ToString() + ".jpeg");
             }
-            foreach (HiChat.Message m in mes)
+            foreach (Buisness.Message m in mes)
             {
                 PictureBox p = new PictureBox();
                 p.Height = 40;
@@ -336,7 +333,7 @@ namespace Hichat
                         case ".png":
                         case ".jpeg":
                             PictureBox picture = new PictureBox();
-                            picture.Image = HiChat.HiChat.CopyImage(m.Content);
+                            picture.Image = CopyImage(m.Content);
                             picture.SizeMode = PictureBoxSizeMode.Zoom;
                             picture.MinimumSize = new Size(50, 50);
                             picture.MaximumSize = new Size(300, 300);
@@ -360,12 +357,12 @@ namespace Hichat
                                     {
                                         if (MessageBox.Show("File Exist, Overwrite?", "File Exist", MessageBoxButtons.YesNo) == DialogResult.Yes)
                                         {
-                                            File.Copy(HiChat.HiChat.appDataImagePath + m.Type, sf.FileName, true);
+                                            File.Copy(appDataImagePath + m.Type, sf.FileName, true);
                                         }
                                     }
                                     else
                                     {
-                                        File.Copy(HiChat.HiChat.appDataImagePath + m.Type, sf.FileName, true);
+                                        File.Copy(appDataImagePath + m.Type, sf.FileName, true);
                                     }
                                 }
                             };
@@ -375,12 +372,7 @@ namespace Hichat
                 }
                 if (m.Sender.Equals(username))
                 {
-                    p.Image = myImage;/*
-                    p.MouseHover += (sender, e) =>
-                    {
-                        ToolTip toolTip = new ToolTip();
-
-                    };*/
+                    p.Image = myImage;
                     toolTip.SetToolTip(p, username);
                     panelMessage.SizeChanged += (object sender, EventArgs e) =>
                     {
@@ -412,7 +404,7 @@ namespace Hichat
 
         private void updateGrid()
         {
-            List<HiChat.Message> newMessages = HiChat.HiChat.GetMessageOfUser(lstFriend.SelectedItem.ToString());
+            List<Buisness.Message> newMessages = GetMessageOfUser(lstFriend.SelectedItem.ToString());
             int oldMessages = messages.Count;
             newMessages.Sort((x, y) => x.Message_date.CompareTo(y.Message_date));
 
@@ -435,7 +427,7 @@ namespace Hichat
             if (MessageBox.Show("Do you want to change password?", "Password", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 string passw = Interaction.InputBox("What is your desired new password?", "New Password", "Default text");
-                HiChat.HiChat.ResetPassword(username, Interaction.InputBox("What is your old password to verify?", "Old Password?", "Default text"), passw);
+                ResetPassword(username, Interaction.InputBox("What is your old password to verify?", "Old Password?", "Default text"), passw);
             }
         }
         private void changeMyPictureToolStripMenuItem_Click(object sender, EventArgs e)
@@ -444,8 +436,8 @@ namespace Hichat
             fd.Filter = "Image Files(*.jpg; *.jpeg; *.gif; *.bmp)| *.jpg; *.jpeg; *.gif; *.bmp";
             if (fd.ShowDialog() == DialogResult.OK)
             {
-                Image i = HiChat.HiChat.CopyImage(fd.FileName);
-                HiChat.HiChat.SetProfileImage(username, HiChat.HiChat.SerializeImage(i, HiChat.HiChat.GetImFormat(i)));
+                Image i = CopyImage(fd.FileName);
+                SetProfileImage(username, SerializeImage(i, GetImFormat(i)));
                 MessageBox.Show("Changed Picture", "Changed Picture");
             }
 
@@ -463,9 +455,9 @@ namespace Hichat
                         return;
                     }
                 }
-                if (HiChat.HiChat.UserExist(friend_name))
+                if (UserExist(friend_name))
                 {
-                    HiChat.HiChat.SendFriendRequest(username, friend_name);
+                    SendFriendRequest(username, friend_name);
                     MessageBox.Show("Friend Request Sent");
                     return;
                 }
@@ -501,17 +493,17 @@ namespace Hichat
                         MessageBox.Show("Not accepting .jpeg image file");
                         break;
                     default:
-                        string fileArr = HiChat.HiChat.SerializeFile(fd.FileName);
+                        string fileArr = SerializeFile(fd.FileName);
                         string fileName = username + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + Path.GetExtension(fd.SafeFileName);
                         if (tabControlFriendGroup.SelectedIndex == 0)
                         {
-                            HiChat.HiChat.AddMessageToLocal(HiChat.HiChat.SendMessage(username, lstFriend.SelectedItem.ToString(), fileArr, fileName));
+                            AddMessageToLocal(SendMessage(username, lstFriend.SelectedItem.ToString(), fileArr, fileName));
                         }
                         else if (tabControlFriendGroup.SelectedIndex == 1)
                         {
-                            HiChat.HiChat.AddMessageToLocal(HiChat.HiChat.SendMessageToGroup(username, ((Group)lstGroup.SelectedItem).Id.ToString(), fileArr, fileName));
+                            AddMessageToLocal(SendMessageToGroup(username, ((Group)lstGroup.SelectedItem).Id.ToString(), fileArr, fileName));
                         }
-                        HiChat.HiChat.BackUpFileToFolder(fd.FileName, fileName);
+                        BackUpFileToFolder(fd.FileName, fileName);
                         MessageBox.Show("File Sent", "File Sent");
                         break;
                 }
@@ -522,18 +514,18 @@ namespace Hichat
             OpenFileDialog fd = new OpenFileDialog();
             fd.Filter = "Image Files(*.jpg; *.jpeg; *.gif; *.bmp)| *.jpg; *.jpeg; *.gif; *.bmp";
             if (fd.ShowDialog() == DialogResult.OK)
-            {
+            { 
                 string fileName = username + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + Path.GetExtension(fd.SafeFileName);
-                string imgArr = HiChat.HiChat.SerializeImage(new Bitmap(fd.FileName), HiChat.HiChat.GetImFormat(new Bitmap(fd.FileName)));
+                string imgArr = SerializeImage(new Bitmap(fd.FileName), GetImFormat(new Bitmap(fd.FileName)));
                 if (tabControlFriendGroup.SelectedIndex == 0)
                 {
-                    HiChat.HiChat.AddMessageToLocal(HiChat.HiChat.SendMessage(username, lstFriend.SelectedItem.ToString(), imgArr, fileName));
+                    AddMessageToLocal(SendMessage(username, lstFriend.SelectedItem.ToString(), imgArr, fileName));
                 }
                 else
                 {
-                    HiChat.HiChat.AddMessageToLocal(HiChat.HiChat.SendMessageToGroup(username, ((Group)lstGroup.SelectedItem).Id, imgArr, fileName));
+                    AddMessageToLocal(SendMessageToGroup(username, ((Group)lstGroup.SelectedItem).Id, imgArr, fileName));
                 }
-                HiChat.HiChat.BackUpFileToFolder(fd.FileName, fileName);
+                BackUpFileToFolder(fd.FileName, fileName);
                 MessageBox.Show("Image Sent", "Image Sent");
             }
         }
@@ -545,7 +537,7 @@ namespace Hichat
             int indx = Convert.ToInt32(parentMenu.Tag);
             string friendName = lstFriend.Items[indx].ToString();
             string alias = Interaction.InputBox("Please type a group alias", "Create a group", "");
-            HiChat.HiChat.RegisterGroup(username, friendName, alias);
+            RegisterGroup(username, friendName, alias);
         }
         private void FormMenu_DeleteFriend_Click(object sender, EventArgs e)
         {
@@ -557,8 +549,8 @@ namespace Hichat
             {
                 if (MessageBox.Show("You are About to Delete You Friend " + friendName + "\nARE you sure to continue? ", "Warning! Delete Friend", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
-                    HiChat.HiChat.DeleteFriend(username, friendName);
-                    friendList = HiChat.HiChat.GetFriend(username);
+                    DeleteFriend(username, friendName);
+                    friendList = GetFriend(username);
                     lstFriend.DataSource = friendList;
                 }
             }
@@ -582,7 +574,7 @@ namespace Hichat
             {
                 foreach (string item in me.Sheet.CheckedItems)
                 {
-                    HiChat.HiChat.AddGroup(item, me.group.Id);
+                    AddGroup(item, me.group.Id);
                 }
                 MessageBox.Show("Add Group Success");
             }
@@ -597,9 +589,9 @@ namespace Hichat
             string groupID = group.Id;
             if (MessageBox.Show("Are you sure to quit the group " + group.Alias, "Quit Group", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                HiChat.HiChat.QuitGroup(username, groupID);
+                QuitGroup(username, groupID);
                 MessageBox.Show("Group Quit Success", "Group Quit");
-                groupList = HiChat.HiChat.GetGroupByID(HiChat.HiChat.GetGroupID(username));
+                groupList = GetGroupByID(GetGroupID(username));
                 lstGroup.DataSource = groupList;
             }
         }
@@ -626,7 +618,7 @@ namespace Hichat
             if (e.Button == MouseButtons.Right)
             {
                 int indx = lstFriend.IndexFromPoint(e.Location);
-                if (((ListBox)sender).SelectedIndex.Equals(indx))
+                if (((ListBox)sender).SelectedIndex.Equals(indx) && indx >= 0)
                 {
                     ContextMenu cm = new ContextMenu();
                     cm.MenuItems.Add(new MenuItem("Delete this friend", DeleteFriend_Click));
@@ -641,7 +633,7 @@ namespace Hichat
             if (e.Button == MouseButtons.Right)
             {
                 int indx = lstGroup.IndexFromPoint(e.Location);
-                if (((ListBox)sender).SelectedIndex.Equals(indx))
+                if (((ListBox)sender).SelectedIndex.Equals(indx) && indx >= 0)
                 {
                     ContextMenu cm = new ContextMenu();
                     cm.MenuItems.Add(new MenuItem("Quit Group", QuitGroup_Click));
@@ -653,7 +645,7 @@ namespace Hichat
         }
         private void tabControlFriendGroup_SelectedIndexChanged(object sender, EventArgs e)
         {
-            messages = new List<HiChat.Message>();
+            messages = new List<Buisness.Message>();
             panelMessage.Controls.Clear();
             count = 0;
         }
